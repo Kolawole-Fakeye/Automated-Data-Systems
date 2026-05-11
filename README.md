@@ -1,25 +1,38 @@
 # Automated Operational Intelligence & Data Engines
 
-This repository features a collection of Python-based automation engines designed to bridge the gap between high-level systems engineering and data analytics. Each project demonstrates the use of real-time data ingestion (APIs), state-machine logic (SQL), and interactive visualization.
+A collection of Python-based automation engines that bridge systems engineering with modern data analytics. Each engine solves real operational problems using live data ingestion, logic-based automation, and visualization.
 
-## 1. Healthcare Power Guardian (Critical Infrastructure)
-**Problem:** Preventing power-related downtime in life-critical medical environments.
-**Solution:** A real-time monitoring engine that manages tri-source power logic (Grid, Solar, Diesel). It automates load-shedding to prioritize ICU ventilators and critical clinical equipment during grid failures.
-* **Tech Stack:** Python, SQLite, Logic-based Automation.
+## Projects
 
-## 2. Fintech Treasury Engine (Financial Risk Management)
-**Problem:** Protecting corporate liquidity from high currency volatility (USD/NGN).
-**Solution:** An automated treasury monitor that pulls live exchange rates via API. It implements rule-based triggers to suggest currency hedging or trades based on specific business risk tolerances (1%–5% thresholds).
-* **Tech Stack:** Python (Requests), API Integration, Pandas.
+### 1. Healthcare Power Guardian
+**Problem**: Preventing power failures in critical medical environments.  
+**Solution**: Real-time tri-source power monitoring (Grid, Solar, Diesel) with automated load-shedding to prioritize ICU and life-support equipment.  
+**Tech**: Python, SQLite, Rule-based Logic.
 
-## 3. Global Logistics Intelligence Hub (Supply Chain)
-**Problem:** Managing port congestion and environmental delays in maritime shipping.
-**Solution:** A predictive tracking system that integrates live AIS ship data and weather APIs. It allows for real-time asset monitoring and automated risk assessment for global shipping routes.
-* **Tech Stack:** Python, Plotly (Geospatial Mapping), JSON Data Handling.
+### 2. Fintech Treasury Engine
+**Problem**: Protecting liquidity from USD/NGN volatility.  
+**Solution**: Live exchange rate monitoring with automated hedging recommendations based on risk thresholds.  
+**Tech**: Python (Requests + Pandas), API Integration.
+
+### 3. Global Logistics Intelligence Hub
+**Problem**: Managing port congestion and shipping delays.  
+**Solution**: Real-time tracking system using AIS and weather data for predictive risk assessment.  
+**Tech**: Python, Plotly (Geospatial), API Integration.
+
+## Technical Skills Demonstrated
+- Automated ETL pipelines from live APIs
+- Rule-based decision engines
+- Data cleaning & transformation with Pandas
+- Interactive visualization with Plotly
+- SQLite database management
 
 ---
 
-### Technical Proficiency
-* **Data Pipelines:** Automated ETL from live API sources.
-* **Database Management:** SQL state tracking and historical logging.
-* **Operational Engineering:** 15+ years of infrastructure experience applied to modern data logic.
+Would you like me to:
+- Improve the individual project descriptions?
+- Suggest how to add screenshots or demo outputs?
+- Or create a stronger overall portfolio strategy that includes this new repo?
+
+This repo is a good addition. With some polishing, it will strengthen your profile significantly. 
+
+What do you want to do next with it?
