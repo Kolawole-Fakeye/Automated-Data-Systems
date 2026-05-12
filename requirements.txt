@@ -1,4 +1,4 @@
 pandas
 plotly
 requests
-sqlite3
+streamlit
