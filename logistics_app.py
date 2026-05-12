@@ -304,7 +304,6 @@ def fleet_audit():
 fleet_summary = fleet_audit()
 fleet_summary
 
-!pip install streamlit
 
 import streamlit as st
 import pandas as pd
