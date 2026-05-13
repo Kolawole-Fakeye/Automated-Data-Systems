@@ -1,30 +1,38 @@
-# Automated Operational Intelligence & Data Engines
+# 🏗️ Automated Operational Intelligence & Data Engines
+**Kolawole Afolabi Fakeye | Systems & Data Engineer**
 
-A collection of Python-based automation engines that bridge systems engineering with modern data analytics. Each engine solves real operational problems using live data ingestion, logic-based automation, and visualization.
-
-## Projects
-
-### 1. Healthcare Power Guardian
-**Problem**: Preventing power failures in critical medical environments.  
-**Solution**: Real-time tri-source power monitoring (Grid, Solar, Diesel) with automated load-shedding to prioritize ICU and life-support equipment.  
-**Tech**: Python, SQLite, Rule-based Logic.
-
-### 2. Fintech Treasury Engine
-**Problem**: Protecting liquidity from USD/NGN volatility.  
-**Solution**: Live exchange rate monitoring with automated hedging recommendations based on risk thresholds.  
-**Tech**: Python (Requests + Pandas), API Integration.
-
-### 3. Global Logistics Intelligence Hub
-**Problem**: Managing port congestion and shipping delays.  
-**Solution**: Real-time tracking system using AIS and weather data for predictive risk assessment.  
-**Tech**: Python, Plotly (Geospatial), API Integration.
-
-## Technical Skills Demonstrated
-- Automated ETL pipelines from live APIs
-- Rule-based decision engines
-- Data cleaning & transformation with Pandas
-- Interactive visualization with Plotly
-- SQLite database management
+A collection of Python-based automation engines that bridge systems engineering with modern data analytics. Each engine solves real industrial problems using live data ingestion, prescriptive logic, and executive-level visualization.
 
 ---
 
+## 🚀 Projects
+
+### 1. 🏥 Healthcare Power Guardian (St. Jude’s Hub)
+* **Problem:** Preventing power failures in critical medical environments where downtime is fatal.
+* **Solution:** Real-time tri-source power monitoring (Grid, Solar, Diesel) with an automated **Priority Load-Shedding** protocol that disconnects non-essential wings to protect ICU and life-support equipment during grid instability.
+* **Tech:** Python, SQLite State-Management, Rule-based Logic, Infrastructure Simulation.
+
+### 2. 📉 Fintech Treasury Engine
+* **Problem:** Protecting corporate liquidity and capital from extreme USD/NGN volatility.
+* **Solution:** Live exchange rate orchestration via REST APIs. The engine executes automated hedging recommendations across multiple subsidiaries based on specific risk-threshold breaches.
+* **Tech:** Python (Requests + Pandas), API Integration, Financial Risk Modeling, Audit Logging.
+
+### 3. 🚢 Titan Fleet Intelligence (Logistics)
+* **Problem:** Managing global port congestion, vessel stasis, and environmental accountability.
+* **Solution:** A high-contrast geospatial tracking system that differentiates between "Weather Delays" and "Critical Unknown Stasis" while monitoring the fleet’s **Carbon Footprint (CO2 metrics)**.
+* **Tech:** Python, Mapbox/Plotly (Geospatial), Environmental Impact Modeling, Prescriptive Risk Auditing.
+
+---
+
+## 🛠️ Technical Skills Demonstrated
+* **Automated ETL Pipelines:** Engineering data ingestion from live REST APIs (FX & Maritime AIS).
+* **Prescriptive Analytics:** Developing rule-based engines that suggest or execute autonomous operational actions.
+* **Environmental Oversight:** Integrating sustainability metrics (CO2 tracking) into industrial dashboards.
+* **Data Integrity:** Managing persistent SQLite databases with automated audit trails for compliance.
+* **Executive Visualization:** Building modern, high-contrast interactive UIs with Streamlit and Plotly.
+
+---
+
+## 📩 Contact & Collaboration
+* **Location:** Lagos, Nigeria
+* **Specialization:** Systems Engineering | Data Analysis | Operational Automation
