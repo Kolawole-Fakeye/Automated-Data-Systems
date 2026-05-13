@@ -5,7 +5,7 @@ import requests
 import plotly.express as px
 from datetime import datetime
 
-# ==================== PAGE CONFIG ====================
+# ====================== CONFIG ======================
 st.set_page_config(
     page_title="AGV Treasury Command",
     page_icon="💰",
@@ -13,19 +13,20 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Dark Theme with Gold Accents
+# Modern Luxurious Dark Theme
 st.markdown("""
     <style>
     .main { background-color: #0a0a0a; }
-    h1, h2, h3 { color: #ffd700; }
-    .stMetric { background-color: #1a1a1a; border-radius: 10px; }
+    h1, h2 { color: #ffd700; font-weight: 600; }
+    .stMetric { background-color: #1a1a1a; border-radius: 12px; padding: 10px; }
+    .sidebar .sidebar-content { background-color: #111111; }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("💰 AGV GROUP TREASURY COMMAND CENTER")
 st.markdown("**Real-time Currency Risk Management & Automated Hedging System**")
 
-# ==================== DATABASE ====================
+# ====================== DATABASE ======================
 def init_db():
     conn = sqlite3.connect('agv_treasury.db', check_same_thread=False)
     cursor = conn.cursor()
@@ -38,7 +39,6 @@ def init_db():
                       (LogID INTEGER PRIMARY KEY, Timestamp TEXT, Subsidiary TEXT, 
                        Action TEXT, Amount_NGN REAL)''')
     
-    # Insert default data if empty
     cursor.execute("SELECT COUNT(*) FROM Subsidiaries")
     if cursor.fetchone()[0] == 0:
         subs = [(1, 'AGV Media Hub', 1.0), (2, 'AGV Systems Engineering', 2.5), (3, 'AGV Heritage Logistics', 5.0)]
@@ -50,7 +50,7 @@ def init_db():
 
 conn = init_db()
 
-# ==================== LIVE DATA ====================
+# ====================== LIVE DATA ======================
 opening_rate = 1450.00
 try:
     response = requests.get("https://open.er-api.com/v6/latest/USD")
@@ -59,19 +59,19 @@ try:
 except:
     live_rate, market_move = 1550.00, 6.90
 
-# ==================== KPI SECTION ====================
+# ====================== KPI SECTION ======================
 col1, col2, col3 = st.columns(3)
-col1.metric("Live USD/NGN Rate", f"₦{live_rate:,.2f}", f"{market_move:+.2f}%")
-col2.metric("Market Status", "HIGH VOLATILITY" if abs(market_move) > 2 else "STABLE", "")
-col3.metric("Baseline Rate", f"₦{opening_rate:,.2f}", "")
+col1.metric("LIVE USD/NGN", f"₦{live_rate:,.2f}", f"{market_move:+.2f}%")
+col2.metric("MARKET STATUS", "HIGH VOLATILITY" if abs(market_move) > 2 else "STABLE")
+col3.metric("BASELINE RATE", f"₦{opening_rate:,.2f}")
 
 st.divider()
 
-# ==================== SIDEBAR ====================
+# ====================== SIDEBAR ======================
 st.sidebar.header("⚙️ Simulation Controls")
-sim_move = st.sidebar.slider("Simulated Volatility (%)", 0.0, 15.0, float(abs(market_move)), step=0.1)
+sim_move = st.sidebar.slider("Simulated Market Volatility (%)", 0.0, 15.0, float(abs(market_move)), step=0.1)
 
-if st.sidebar.button("🚀 Run Treasury Audit & Hedge", type="primary"):
+if st.sidebar.button("🚀 RUN TREASURY AUDIT & AUTO-HEDGE", type="primary", use_container_width=True):
     cursor = conn.cursor()
     cursor.execute("""SELECT s.SubID, s.Name, s.HedgeThreshold, t.NGN_Balance, t.USD_Balance 
                       FROM Subsidiaries s JOIN Treasury t ON s.SubID = t.SubID""")
@@ -89,27 +89,26 @@ if st.sidebar.button("🚀 Run Treasury Audit & Hedge", type="primary"):
                            (datetime.now().strftime("%H:%M:%S"), name, 'AUTO-HEDGE', hedge_ngn))
     
     conn.commit()
-    st.sidebar.success("✅ Audit Complete. Hedges Executed.")
+    st.success("✅ Treasury Audit Completed. Hedges Executed Successfully.")
 
-# ==================== MAIN DASHBOARD ====================
+# ====================== MAIN DASHBOARD ======================
 df = pd.read_sql_query("SELECT s.Name, t.NGN_Balance, t.USD_Balance FROM Subsidiaries s JOIN Treasury t ON s.SubID = t.SubID", conn)
 logs_df = pd.read_sql_query("SELECT * FROM Hedge_Logs ORDER BY LogID DESC LIMIT 10", conn)
 
-tab1, tab2 = st.tabs(["📊 Capital Overview", "📜 Audit Trail"])
+tab1, tab2 = st.tabs(["📊 Consolidated Treasury View", "📜 Recent Audit Trail"])
 
 with tab1:
-    st.subheader("Consolidated Treasury Position")
+    st.subheader("Subsidiary Treasury Position")
     fig = px.bar(df, x='Name', y=['NGN_Balance', 'USD_Balance'],
-                 title="Subsidiary Treasury Balances",
+                 title="Group Treasury Balances (NGN & USD)",
                  barmode='group',
                  template="plotly_dark",
-                 height=500,
+                 height=520,
                  color_discrete_map={'NGN_Balance': '#00CC96', 'USD_Balance': '#636EFA'})
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     st.subheader("Recent Hedge Actions")
-    st.dataframe(logs_df, use_container_width=True)
+    st.dataframe(logs_df.style.format({"Amount_NGN": "₦{:,.2f}"}), use_container_width=True)
 
-# Footer
-st.caption("Automated Treasury Command System | Built by Kolawole Fakeye")
+st.caption("Automated Treasury Command System | Built by Kolawole Fakeye • Data Analyst & Technical Specialist")
