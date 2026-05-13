@@ -1,106 +1,90 @@
 import streamlit as st
 import pandas as pd
 import sqlite3
-import plotly.graph_objects as go
+import plotly.express as px
 from datetime import datetime
 
 # 1. Page Configuration
-st.set_page_config(page_title="Global Fleet Command", layout="wide")
-st.title("🚢 AGV GLOBAL | LOGISTICS CONTROL TOWER")
-st.write(f"Systems Update: {datetime.now().strftime('%Y-%m-%d %H:%M')} WAT")
+st.set_page_config(page_title="Titan Fleet Intel", layout="wide")
+st.title("🌐 TITAN FLEET INTELLIGENCE | GLOBAL COMMAND")
 
 # 2. THE CLEAN REBUILD: Database Initialization
-def rebuild_logistics_system():
-    # Using a fresh connection
-    conn = sqlite3.connect('logistics_master.db', check_same_thread=False)
+def rebuild_titan_system():
+    conn = sqlite3.connect('titan_fleet.db', check_same_thread=False)
     cursor = conn.cursor()
-    
-    # Drop and Recreate to ensure a clean sheet
-    cursor.execute('DROP TABLE IF EXISTS GlobalShipments')
+    cursor.execute('DROP TABLE IF EXISTS Fleet')
     cursor.execute('''
-    CREATE TABLE GlobalShipments (
+    CREATE TABLE Fleet (
         ShipID INTEGER PRIMARY KEY,
         ShipName TEXT,
         Origin TEXT,
         Destination TEXT,
-        Lat REAL,
-        Lon REAL,
-        Status TEXT,
+        Lat REAL, Lon REAL,
+        Speed REAL, -- 0 means stuck
         Weather TEXT,
-        RiskLevel TEXT
+        CO2_Metric REAL -- Environmental Impact (Tonnes)
     )
     ''')
 
-    # The Expanded 8-Ship Fleet
+    # Modern 8-Ship Fleet
     fleet = [
-        (1, 'Maersk Advancer', 'Shanghai', 'Lagos (Apapa)', 6.45, 3.39, 'Moving', 'Clear', 'Low'),
-        (2, 'MSC Carole', 'Singapore', 'Lekki Deep Sea Port', 6.41, 3.93, 'Moving', 'Clear', 'Low'),
-        (3, 'Ever Given II', 'Singapore', 'Rotterdam', 29.97, 32.53, 'Stationary', 'High Winds', 'High'),
-        (4, 'CMA CGM Liberty', 'Marseille', 'Lagos (Tin Can)', 6.44, 3.35, 'Moving', 'Clear', 'Low'),
-        (5, 'HMM Rotterdam', 'Busan', 'Lagos (Apapa)', 35.17, 129.07, 'Moving', 'Foggy', 'Low'),
-        (6, 'ZIM Luanda', 'Haifa', 'Luanda', -8.81, 13.23, 'Moving', 'Clear', 'Low'),
-        (7, 'COSCO Pride', 'Ningbo', 'Onne Port', 4.67, 7.15, 'Stationary', 'Stormy', 'High'),
-        (8, 'Grimaldi Great Lagos', 'Antwerp', 'Lagos', 51.21, 4.40, 'Moving', 'Clear', 'Low')
+        (1, 'Maersk Advancer', 'Shanghai', 'Lagos (Apapa)', 6.45, 3.39, 18.5, 'Clear', 124.5),
+        (2, 'MSC Carole', 'Singapore', 'Lekki Deep Sea', 6.41, 3.93, 14.2, 'Clear', 98.2),
+        (3, 'Ever Given II', 'Singapore', 'Rotterdam', 29.97, 32.53, 0.0, 'High Winds', 0.0),
+        (4, 'CMA CGM Liberty', 'Marseille', 'Lagos (Tin Can)', 12.44, -17.35, 16.1, 'Clear', 110.4),
+        (5, 'HMM Rotterdam', 'Busan', 'Lagos (Apapa)', 35.17, 129.07, 19.8, 'Foggy', 156.7),
+        (6, 'ZIM Luanda', 'Haifa', 'Luanda', -8.81, 13.23, 15.0, 'Clear', 89.1),
+        (7, 'COSCO Pride', 'Ningbo', 'Onne Port', 4.67, 7.15, 0.0, 'Stormy', 0.0),
+        (8, 'Grimaldi Lagos', 'Antwerp', 'Lagos', 51.21, 4.40, 12.5, 'Clear', 75.3)
     ]
     
-    cursor.executemany('''
-        INSERT INTO GlobalShipments (ShipID, ShipName, Origin, Destination, Lat, Lon, Status, Weather, RiskLevel)
-        VALUES (?,?,?,?,?,?,?,?,?)
-    ''', fleet)
+    cursor.executemany('INSERT INTO Fleet VALUES (?,?,?,?,?,?,?,?,?)', fleet)
     conn.commit()
     return conn
 
-# Connect to the clean sheet
-if 'log_conn' not in st.session_state:
-    st.session_state.log_conn = rebuild_logistics_system()
+if 'titan_conn' not in st.session_state:
+    st.session_state.titan_conn = rebuild_titan_system()
 
-# 3. INTERACTIVE RISK AUDIT
-st.sidebar.header("🕹️ Command Simulation")
-selected_ship = st.sidebar.selectbox("Vessel Select", pd.read_sql_query("SELECT ShipName FROM GlobalShipments", st.session_state.log_conn))
+# 3. TOP KPI ROW (Visibility on what's stuck)
+df = pd.read_sql_query("SELECT * FROM Fleet", st.session_state.titan_conn)
+stuck_count = len(df[df['Speed'] == 0])
+total_co2 = df['CO2_Metric'].sum()
 
-if st.sidebar.button("🚨 Simulate Engine Failure"):
-    cursor = st.session_state.log_conn.cursor()
-    cursor.execute("UPDATE GlobalShipments SET Status = 'Stationary', RiskLevel = 'CRITICAL' WHERE ShipName = ?", (selected_ship,))
-    st.session_state.log_conn.commit()
-    st.sidebar.error(f"EMERGENCY: {selected_ship} reports zero knots.")
+kpi1, kpi2, kpi3 = st.columns(3)
+kpi1.metric("Fleet Utilization", f"{len(df) - stuck_count}/{len(df)} Active", f"-{stuck_count} Stationary", delta_color="inverse")
+kpi2.metric("Fleet Status", "CRITICAL" if stuck_count > 1 else "STABLE")
+kpi3.metric("Daily CO2 Impact", f"{total_co2:.1f} T", "Eco-Track Active")
 
-# 4. DATA VISUALIZATION
-df = pd.read_sql_query("SELECT * FROM GlobalShipments", st.session_state.log_conn)
+# 4. MODERN HIGH-CONTRAST MAP
+st.subheader("🛰️ Global Motion Tracking")
+# We use color to show speed (Moving vs Stuck) and size to show CO2 impact
+fig = px.scatter_geo(df,
+                     lat='Lat', lon='Lon',
+                     color='Speed', # Visual cue for motion
+                     size='CO2_Metric', # Visual cue for environmental impact
+                     hover_name='ShipName',
+                     hover_data=['Destination', 'Weather', 'Speed'],
+                     projection="natural earth",
+                     color_continuous_scale=px.colors.sequential.Viridis,
+                     template="plotly_dark")
 
-# Refined Risk Calculation for the Dashboard
-def refine_risk(row):
-    if row['Status'] == 'Stationary' and row['Weather'] != 'Clear':
-        return "MODERATE (Weather)"
-    if row['Status'] == 'Stationary' and row['Weather'] == 'Clear':
-        return "CRITICAL (Unknown)"
-    return "NOMINAL"
-
-df['Audit_Status'] = df.apply(refine_risk, axis=1)
-
-# The Map
-fig = go.Figure(go.Scattergeo(
-    lat = df['Lat'], lon = df['Lon'],
-    mode = 'markers+text',
-    text = df['ShipName'],
-    textposition = "top center",
-    marker = dict(
-        size = 12,
-        color = df['Audit_Status'].map({'NOMINAL': 'green', 'MODERATE (Weather)': 'orange', 'CRITICAL (Unknown)': 'red'}),
-        symbol = 'diamond',
-        line = dict(width=1, color='white')
-    )
-))
-
-fig.update_layout(
-    geo = dict(projection_type='equirectangular', showland=True, landcolor="rgb(240, 240, 240)", oceancolor="rgb(10, 25, 50)", showocean=True),
-    margin={"r":0,"t":0,"l":0,"b":0}, height=500, template="plotly_dark"
-)
+fig.update_layout(height=600, margin={"r":0,"t":40,"l":0,"b":0})
 st.plotly_chart(fig, use_container_width=True)
 
-# 5. FLEET SUMMARY TABLE
-st.subheader("📋 Fleet Audit Log")
-st.dataframe(df[['ShipName', 'Origin', 'Destination', 'Status', 'Weather', 'Audit_Status']], use_container_width=True)
+# 5. SPLIT VIEW: DATA AUDIT & ENVIRONMENTAL IMPACT
+col1, col2 = st.columns([2, 1])
 
-# AI Prescriptive Report
-if "CRITICAL" in df[df['ShipName'] == selected_ship]['Audit_Status'].values:
-    st.error(f"**ACTION REQUIRED FOR {selected_ship.upper()}:** Vessel is stationary in clear weather. Initiate mechanical audit and notify {df[df['ShipName'] == selected_ship]['Destination'].values[0]} port authorities.")
+with col1:
+    st.subheader("📋 Fleet Motion Audit")
+    # Styling to highlight stuck ships in red
+    def highlight_stuck(s):
+        return ['background-color: #990000' if v == 0 else '' for v in s]
+    
+    st.dataframe(df[['ShipName', 'Destination', 'Speed', 'Weather']].style.apply(highlight_stuck, subset=['Speed']), use_container_width=True)
+
+with col2:
+    st.subheader("🌱 Environmental Impact")
+    fig_co2 = px.pie(df, values='CO2_Metric', names='ShipName', hole=0.4, 
+                     color_discrete_sequence=px.colors.sequential.Greens_r,
+                     template="plotly_dark")
+    st.plotly_chart(fig_co2, use_container_width=True)
